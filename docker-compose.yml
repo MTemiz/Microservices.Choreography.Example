@@ -1,0 +1,23 @@
+﻿services: 
+  sqlserver:
+      image: mcr.microsoft.com/mssql/server:2019-latest
+      container_name: sqlserver
+      environment:
+        - SA_PASSWORD=Strong@Passw0rd
+        - ACCEPT_EULA=Y
+      ports:
+        - "1433:1433"
+      volumes:
+        - sqlserver_data:/var/opt/mssql
+  
+  mongodb:
+       image: mongo:latest
+       container_name: mongodb
+       ports:
+         - "27017:27017"
+       volumes:
+         - mongodb_data:/data/db 
+        
+volumes:
+  sqlserver_data:
+  mongodb_data:

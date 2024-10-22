@@ -18,7 +18,7 @@ public class OrderCreatedEventConsumer(MongoDbService mongoDbService, IPublishEn
         foreach (var orderItem in context.Message.OrderItems)
         {
             IAsyncCursor<Models.Stock> stocksInWarehouse =
-                await stockCollection.FindAsync(s => s.Id == orderItem.ProductId && s.Count >= orderItem.Count);
+                await stockCollection.FindAsync(s => s.ProductId == orderItem.ProductId.ToString() && s.Count >= orderItem.Count);
 
             stockResults.Add(await stocksInWarehouse.AnyAsync());
         }
@@ -28,13 +28,13 @@ public class OrderCreatedEventConsumer(MongoDbService mongoDbService, IPublishEn
             foreach (var orderItem in context.Message.OrderItems)
             {
                 IAsyncCursor<Models.Stock> stocksInWarehouse =
-                    await stockCollection.FindAsync(s => s.Id == orderItem.ProductId);
+                    await stockCollection.FindAsync(s => s.ProductId == orderItem.ProductId.ToString());
 
                 var stockInWarehouse = await stocksInWarehouse.FirstOrDefaultAsync();
 
                 stockInWarehouse.Count -= orderItem.Count;
 
-                await stockCollection.FindOneAndReplaceAsync(c => c.ProductId == orderItem.ProductId, stockInWarehouse);
+                await stockCollection.FindOneAndReplaceAsync(c => c.ProductId == orderItem.ProductId.ToString(), stockInWarehouse);
             }
 
             StockReservedEvent stockReservedEvent = new()
